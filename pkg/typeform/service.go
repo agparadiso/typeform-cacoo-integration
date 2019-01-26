@@ -2,20 +2,31 @@ package typeform
 
 import (
 	"context"
-	"fmt"
+
+	"github.com/agparadiso/tfcacoo/pkg/form"
+	"github.com/pkg/errors"
 )
 
 type Service interface {
-	BuildForm(ctx context.Context, question string) error
+	CreateForm(ctx context.Context, questions []string, tfapikey string) (string, error)
 }
 
-type typeform struct{}
+type typeform struct {
+	form form.Form
+}
 
 func NewService() Service {
-	return &typeform{}
+	form := form.New()
+	return &typeform{
+		form: form,
+	}
 }
 
-func (t *typeform) BuildForm(ctx context.Context, question string) error {
-	fmt.Println("buildingForm")
-	return nil
+func (t *typeform) CreateForm(ctx context.Context, questions []string, tfapikey string) (string, error) {
+	err := t.form.Build(questions)
+	if err != nil {
+		return "", errors.Wrap(err, "Failed to build the form")
+	}
+
+	return t.form.Push(tfapikey)
 }

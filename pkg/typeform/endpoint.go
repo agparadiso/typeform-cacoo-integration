@@ -4,33 +4,43 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/go-kit/kit/endpoint"
 )
 
 type formRequest struct {
-	question string
+	questions []string
+	tfapikey  string
 }
 type formResponse struct {
-	err error
+	tflink string
+	err    error
 }
 
 func makeBuildFormEndpoint(svc Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(formRequest)
 		res := formResponse{}
-		res.err = svc.BuildForm(ctx, req.question)
+		res.tflink, res.err = svc.CreateForm(ctx, req.questions, req.tfapikey)
 		return res, nil
 	}
 }
 
 func decodeBuildFormRequest(_ context.Context, r *http.Request) (interface{}, error) {
-	question := r.URL.Query().Get("question")
-	if question == "" {
-		return nil, fmt.Errorf("missing question parameter")
+	questions := r.URL.Query().Get("questions")
+	if questions == "" {
+		return nil, fmt.Errorf("missing questions parameter")
 	}
+
+	tfapikey := r.URL.Query().Get("tfapikey")
+	if tfapikey == "" {
+		return nil, fmt.Errorf("missing tfapikey parameter")
+	}
+
 	return formRequest{
-		question: question,
+		questions: strings.Split(questions, ","),
+		tfapikey:  tfapikey,
 	}, nil
 }
 

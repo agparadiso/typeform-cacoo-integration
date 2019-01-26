@@ -10,5 +10,5 @@ import (
 func main() {
 	s := server.New()
 	http.Handle("/", s)
-	log.Fatal(http.ListenAndServe(":3001", nil))
+	log.Fatal(http.ListenAndServe(":3000", nil))
 }
