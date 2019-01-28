@@ -1,7 +1,9 @@
 # typeform-cacoo-integration
 Typeform integration for Cacoo
 
-This integration has been build in order to get quick and effective feedback on your cacoo diagrams by using the power of Typeform
+This integration has been build in order to get quick and effective feedback on your cacoo diagrams by using the power of Typeform.
+
+The way it works is: it gets cacoo diagram image, uploads it to typeform images, creates a form with the questions entered adding the diagram image in every question.
 
 In order to run this integration in local just
 
