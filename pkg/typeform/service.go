@@ -8,7 +8,7 @@ import (
 )
 
 type Service interface {
-	CreateForm(ctx context.Context, questions []string, tfapikey string) (string, error)
+	CreateForm(ctx context.Context, questions []string, tfapikey, cacooapikey, diagramID string) (string, error)
 }
 
 type typeform struct {
@@ -22,8 +22,13 @@ func NewService() Service {
 	}
 }
 
-func (t *typeform) CreateForm(ctx context.Context, questions []string, tfapikey string) (string, error) {
-	err := t.form.Build(questions)
+func (t *typeform) CreateForm(ctx context.Context, questions []string, tfapikey, cacooapikey, diagramID string) (string, error) {
+	diagramURL, err := t.form.UploadImage(diagramID, cacooapikey, tfapikey)
+	if err != nil {
+		return "", errors.Wrap(err, "failed to upload image")
+	}
+
+	err = t.form.Build(questions, diagramURL, tfapikey)
 	if err != nil {
 		return "", errors.Wrap(err, "Failed to build the form")
 	}
