@@ -15,23 +15,27 @@ const (
 	cacooDiagramImageEndpoint = "https://cacoo.com/api/v1/diagrams"
 )
 
+// Form interface represents the functions needed for this integration
 type Form interface {
 	UploadImage(diagramID, cacooapikey, tfapikey string) (string, error)
 	Build(questions []string, diagramURL, tfapikey string) error
 	Push(tfapikey string) (string, error)
 }
 
+// Attachment represents the diagram images attached
 type Attachment struct {
 	Type string `json:"type"`
 	Href string `json:"href"`
 }
 
+// Field represents each field of the form
 type Field struct {
 	Title      string     `json:"title"`
 	Fieldtype  string     `json:"type"`
 	Attachment Attachment `json:"attachment"`
 }
 
+// FormDefinition represents the form creation payload
 type FormDefinition struct {
 	Title    string `json:"title"`
 	Settings struct {
@@ -41,10 +45,13 @@ type FormDefinition struct {
 	Fields []Field `json:"fields"`
 }
 
+// New will return an instance of FormDefinition
 func New() *FormDefinition {
 	return &FormDefinition{}
 }
 
+// Build will take an array of questions, the diagramURL and the tf access token
+// and will return an error in case there is one when building the form definition
 func (f *FormDefinition) Build(questions []string, diagramURL, tfapikey string) error {
 	f.Title = "Feedback on my Diagram"
 	f.Settings.Language = "en"
@@ -66,6 +73,8 @@ func (f *FormDefinition) Build(questions []string, diagramURL, tfapikey string) 
 	return nil
 }
 
+// Push will receive a tf access token, marshal the form definition to convert it to a payload
+// and will post it to create the form returning the link to it
 func (f *FormDefinition) Push(tfapikey string) (string, error) {
 	type formcreationresp struct {
 		Link struct {
@@ -94,6 +103,8 @@ func (f *FormDefinition) Push(tfapikey string) (string, error) {
 	return formcreated.Link.Display, nil
 }
 
+// UploadImage will take the diagramID, cacooApiKey and tf access token, will fetch the diagram image url
+// and post it to typeforms images
 func (f *FormDefinition) UploadImage(diagramID, cacooapikey, tfapikey string) (string, error) {
 	type uploadReq struct {
 		URL      string `json:"url"`
